@@ -357,10 +357,6 @@
 
 
 /* autocomplete bar */
-* { box-sizing: border-box; }
-body {
-  font: 16px Arial;
-}
 .autocomplete {
   position: relative;
   display: inline-block;
