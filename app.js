@@ -4,7 +4,7 @@ const alertBanner = document.getElementById("alert");
 alertBanner.innerHTML =
 `
 <div class="alert-banner">
-<p><strong>Alert:</strong> You have <strong>6</strong> overdue tasks
+<p class="alert-message"><strong>Alert:</strong> You have <strong>6</strong> overdue tasks
 to complete</p>
 <p class="alert-banner-close">x</p>
 </div>`
@@ -23,7 +23,7 @@ const alertBanner2 = document.getElementById("alert2");
 alertBanner2.innerHTML =
 `
 <div class="alert-banner2">
-<p><strong>Alert:</strong> You have <strong>6</strong> additional overdue tasks
+<p class="alert-message2"><strong>Alert:</strong> You have <strong>6</strong> additional overdue tasks
 to complete</p>
 <p class="alert-banner-close2">x</p>
 </div>`
@@ -361,73 +361,136 @@ send.addEventListener('click', () => {
 
 //search functionality
 
-$('.form-field').keyup(function (event) {        
-    for(var i = 1 ; i < 5 ; i++){      
-        if(!($(`.members-container${i} .members-text p`).text().toLowerCase().includes(this.value.toLowerCase()))){
-            $(`.members-container${i}`).css("display" , "none");
-        } else {            
-            $(`.members-container${i}`).css("display" , "flex");
+var users = ["victoria chambers" , "dale byrd" , "dawn wood" , "dan oliver"];
+
+var field = document.querySelector(".autocomplete");
+
+function autocomplete (inp , arr){
+    var currentFocus;
+    inp.addEventListener("input",function(e){
+        var a, b, i, val = this.value;
+        closeAllLists();
+        if(!val){
+            return false;
         }
+        currentFocus = -1;
+        a = document.createElement("DIV");
+        a.setAttribute("id", this.id + "autocomplete-items");
+        a.setAttribute("class","autocomplete-items");
+        this.parentNode.appendChild(a);
+        for(i = 0 ; i<arr.length ; i++){
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+           b = document.createElement("DIV");
+            b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+            b.innerHTML += arr[i].substr(val.length);
+            b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                b.addEventListener("click", function(e) {
+                inp.value = this.getElementsByTagName("input")[0].value;
+                closeAllLists();
+            });
+            a.appendChild(b);
+          }
+        }
+    });
+
+    inp.addEventListener("keydown", function(e) {
+        var x = document.getElementById(this.id + "autocomplete-list");
+        if (x) x = x.getElementsByTagName("div");
+        if (e.keyCode == 40) {
+          currentFocus++;
+          addActive(x);
+        } else if (e.keyCode == 38) {
+          currentFocus--;
+          addActive(x);
+        } else if (e.keyCode == 13) {
+          e.preventDefault();
+          if (currentFocus > -1) {
+            if (x) x[currentFocus].click();
+          }
+        }
+    });
+
+    function addActive(x) {
+        if (!x) return false;
+        removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
+        x[currentFocus].classList.add("autocomplete-active");
+      }
+      function removeActive(x) {
+        for (var i = 0; i < x.length; i++) {
+          x[i].classList.remove("autocomplete-active");
+        }
+      }
+      function closeAllLists(elmnt) {
+        var x = document.getElementsByClassName("autocomplete-items");
+        for (var i = 0; i < x.length; i++) {
+          if (elmnt != x[i] && elmnt != inp) {
+          x[i].parentNode.removeChild(x[i]);
+        }
+      }
     }
-});
+
+    document.addEventListener("click", function (e) {
+        closeAllLists(e.target);
+    });
+}
+
+autocomplete(document.getElementById("myInput"), users);
 
 //local storage
 
-var notificationOn = document.querySelector('.notification-on');
-var notificationOff = document.querySelector('.notification-off');
-var profileOn = document.querySelector('.profile-on');
-var profileOff = document.querySelector('.profile-off'); 
-var timeButton = document.querySelector('.selected-timezone');
+var email = window['localStorage'].getItem('email');
+var profile = window['localStorage'].getItem('profile');
 var timezone = window['localStorage'].getItem('timezone');
-    
-if(window['localStorage'].getItem('save') === "true"){
-    timeButton.textContent = window['localStorage'].getItem('timezone'); 
+var emailButton = document.querySelector(".email-checkbox");
+var profileButton = document.querySelector(".profile-checkbox");
+var timeButton = document.querySelector(".selected-timezone");
+
+if(window['localStorage'].getItem('save') === 'true'){
+    if( window['localStorage'].getItem('email') == 'true'){
+        emailButton.checked = true;
+    }
+
+    if( window['localStorage'].getItem('email') == 'false'){
+        emailButton.checked = false;
+    }
+
+    if( window['localStorage'].getItem('profile') == 'true'){
+        profileButton.checked = true;
+    }
+
+    if( window['localStorage'].getItem('profile') == 'false'){
+        profileButton.checked = false;
+    }
+    timeButton.textContent = timezone; 
 }
 
-$("#notificationSetting").click(function(event) {
-    window['localStorage'].setItem('notify-on',$(".notification-on").css('color'));
-    window['localStorage'].setItem('notify-off',$(".notification-off").css('color')); 
+
+$(".email-checkbox").click(function(event){
+    email = this.checked + '';
 })
 
-$("#profileSetting").click(function(event) {
-    window['localStorage'].setItem('profile-on',$(".profile-on").css('color'));
-    window['localStorage'].setItem('profile-off',$(".profile-off").css('color')); 
+$(".profile-checkbox").click(function(event){
+    profile = this.checked + '';
 })
-
 
 $("#timezone").click(function (event) {
-    timezone = this.value;            
+    timezone = this.value;          
 })
 
 $('#save').click(function() {
     alert("Your settings have been saved!");
     window['localStorage'].setItem('save' , 'true');
     window['localStorage'].setItem('timezone' , timezone);
+    window['localStorage'].setItem('email' , email);
+    window['localStorage'].setItem('profile' , profile);
 })
 
 $('#cancel').click(function(event){
     alert("Settings have been reverted to default!");
-    window['localStorage'].setItem('timezone' , "Select a Timezone");    
+    window['localStorage'].setItem('timezone' , "Select a Timezone"); 
+    window['localStorage'].setItem('email' , 'false');
+    window['localStorage'].setItem('profile' , 'false');
     window['localStorage'].setItem('save' , 'false');
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

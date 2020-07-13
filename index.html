@@ -280,10 +280,12 @@
         <section class="message">
             <h3>Message User</h3>
 
-            <form>
-                <input required type="search" placeholder="Search for user" class="form-field" id="userField">
+            <form autocomplete="off">
+                <div class="autocomplete">
+                <input required type="text" placeholder="Search for user" class="form-field" id="myInput" name="myCountry" >
+                </div>
                 <textarea required placeholder="Message for user" class="form-area" id="messageField" ></textarea>
-                <button class="button-primary" id="send" >Send</button>
+                <input class="button-primary" id="send" type="submit">
             </form>
         </section>
 
@@ -293,7 +295,7 @@
 
             <!-- custom css toggle code -->
             <label class="switch-light switch-candy" id="notificationSetting" onclick="">
-                <input type="checkbox">
+                <input type="checkbox" class="email-checkbox">
                 
                 <strong>
                     Send Email Notifictions
@@ -307,7 +309,7 @@
             </label>
             <!-- custom css toggle code -->
             <label class="switch-light switch-candy" id="profileSetting" onclick="">
-                    <input type="checkbox">
+                    <input type="checkbox" class="profile-checkbox">
                     
                     <strong>
                         Set Profile to Public
